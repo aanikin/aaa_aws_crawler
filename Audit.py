@@ -11,23 +11,7 @@ def load_accounts_list(accounsFile):
     return accounts
 
 
-def IAMAudit(rootAccountNumber: str, accounsFile: str):
-    rootAccountNumber = rootAccountNumber.strip()
-
-    if not rootAccountNumber or not accounsFile:
-        print("Root account or accounts file not set. Nothing to process.")
-        return
-
-    print("Root account number: " + rootAccountNumber)
-
-    accounts = load_accounts_list(accounsFile)
-
-    if len(accounts) == 0:
-        print("Nothing to process.")
-        return
-
-    print("Number of child accounts: " + str(len(accounts)))
-
+def audit_process(rootAccountNumber, accounts):
     provider = ClientProvider.ClientProvider(rootAccountNumber)
 
     for account in accounts:
@@ -53,3 +37,23 @@ def IAMAudit(rootAccountNumber: str, accounsFile: str):
             pass
         except Exception as e:
             print('Account: ' + account + ' Exception: ' + str(e))
+
+
+def IAMAudit(rootAccountNumber: str, accounsFile: str):
+    rootAccountNumber = rootAccountNumber.strip()
+
+    if not rootAccountNumber or not accounsFile:
+        print("Root account or accounts file not set. Nothing to process.")
+        return
+
+    print("Root account number: " + rootAccountNumber)
+
+    accounts = load_accounts_list(accounsFile)
+
+    if len(accounts) == 0:
+        print("Nothing to process.")
+        return
+
+    print("Number of child accounts: " + str(len(accounts)))
+
+    audit_process(rootAccountNumber, accounts)
