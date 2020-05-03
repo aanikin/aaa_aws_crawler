@@ -131,3 +131,4 @@ dmypy.json
 # Data and Reports
 Data/
 Reports/
+.idea

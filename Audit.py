@@ -3,16 +3,14 @@ import IAM
 
 
 # Multiline file with child account numbers
-def load_accounts_list(accounsFile):
-    accounts = []
-    with open(accounsFile, 'r') as f:
-        accounts = f.read().splitlines()
-
-    return accounts
+def load_accounts_list(accountsFile):
+    with open(accountsFile, 'r') as f:
+        return f.read().splitlines()
 
 
-def audit_process(rootAccountNumber, accounts):
-    provider = ClientProvider.ClientProvider(rootAccountNumber)
+
+
+def audit_process(provider, accounts):
 
     for account in accounts:
         if not account: continue
@@ -26,6 +24,7 @@ def audit_process(rootAccountNumber, accounts):
             print(account + ': IAM client created.')
 
             iam_client = IAM.IAM(iam, account)
+
             iam_client.generate_credential_report()
             iam_client.list_groups()
             iam_client.list_roles()
@@ -34,7 +33,7 @@ def audit_process(rootAccountNumber, accounts):
             iam_client.list_attached_user_policies()
             iam_client.list_attached_group_policies()
             iam_client.list_attached_role_policies()
-            pass
+
         except Exception as e:
             print('Account: ' + account + ' Exception: ' + str(e))
 
@@ -43,17 +42,17 @@ def IAMAudit(rootAccountNumber: str, accounsFile: str):
     rootAccountNumber = rootAccountNumber.strip()
 
     if not rootAccountNumber or not accounsFile:
-        print("Root account or accounts file not set. Nothing to process.")
-        return
+        raise Exception("Root account or accounts file not set. Nothing to process.")
 
     print("Root account number: " + rootAccountNumber)
 
     accounts = load_accounts_list(accounsFile)
 
     if len(accounts) == 0:
-        print("Nothing to process.")
-        return
+        raise Exception("Nothing to process.")
 
     print("Number of child accounts: " + str(len(accounts)))
 
-    audit_process(rootAccountNumber, accounts)
+    provider = ClientProvider.ClientProvider(rootAccountNumber)
+
+    audit_process(provider, accounts)
