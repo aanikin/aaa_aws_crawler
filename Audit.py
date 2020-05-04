@@ -1,5 +1,6 @@
 import ClientProvider
 import IAM
+import config
 
 
 # Multiline file with child account numbers
@@ -8,10 +9,7 @@ def load_accounts_list(accountsFile):
         return f.read().splitlines()
 
 
-
-
 def audit_process(provider, accounts):
-
     for account in accounts:
         if not account: continue
 
@@ -38,7 +36,7 @@ def audit_process(provider, accounts):
             print('Account: ' + account + ' Exception: ' + str(e))
 
 
-def IAMAudit(rootAccountNumber: str, accounsFile: str):
+def IAMAudit(rootAccountNumber: str, accounsFile: str, provider: ClientProvider = None):
     rootAccountNumber = rootAccountNumber.strip()
 
     if not rootAccountNumber or not accounsFile:
@@ -53,6 +51,11 @@ def IAMAudit(rootAccountNumber: str, accounsFile: str):
 
     print("Number of child accounts: " + str(len(accounts)))
 
-    provider = ClientProvider.ClientProvider(rootAccountNumber)
+    if not provider:
+        provider = ClientProvider.ClientProvider(rootAccountNumber)
 
     audit_process(provider, accounts)
+
+
+if __name__ == '__main__':
+    IAMAudit(config.rootAccountNumber, 'data/accounts.txt')

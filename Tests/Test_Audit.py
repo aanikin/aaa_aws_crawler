@@ -47,13 +47,24 @@ class AuditTests(TestCase):
         self.assertRaises(Exception, Audit.IAMAudit, rootAccount, accountsFile)
 
     def test_loadload_accounts_list(self):
-         with patch('builtins.open', mock_open(read_data='account')) as m:
+        with patch('builtins.open', mock_open(read_data='account')) as m:
             r = Audit.load_accounts_list("test")
 
-         m.assert_called_once_with("test", "r")
-         assert r == ['account']
+        m.assert_called_once_with("test", "r")
+        assert r == ['account']
+
+    @patch("ClientProvider.ClientProvider", autospec=True)
+    def test_IAMAudit_accounts_list_is_empty(self, provider):
+        with patch('builtins.open', mock_open(read_data='')) as m:
+            self.assertRaises(Exception, Audit.IAMAudit, "rootAccount", "data_file")
+
+    @patch("ClientProvider.ClientProvider", autospec=True)
+    def test_IAMAudit_without_provider(self, provider):
+        with patch('builtins.open', mock_open(read_data='account')) as m:
+            Audit.IAMAudit("rootAccountNumber", "data_file")
+
+        provider.assert_called_once_with('rootAccountNumber')
 
 
 if __name__ == '__main__':
     unittest.main()
-

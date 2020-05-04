@@ -8,6 +8,14 @@ class ClientProvider(object):
         self._rootAccount = rootAccount
         self._assumeRole = assumeRole
 
+    def __init__(self, rootAccount, accessKey: str = None, secretKey: str = None,
+                 assumeRole='OrganizationAccountAccessRole'):
+        self._rootSession = boto3.Session(aws_access_key_id=accessKey,
+                                          aws_secret_access_key=secretKey)
+
+        self._rootAccount = rootAccount
+        self._assumeRole = assumeRole
+
     def assumed_role_session(self, accountId):
         client = self._rootSession.client('sts')
         stsresponse = client.assume_role(
