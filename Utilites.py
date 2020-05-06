@@ -1,14 +1,14 @@
 import csv
 
 
-def write_string_as_csv(data: bytes, file):
-    credential_report_csv = bytes(data).decode('ascii')
-    reader = csv.DictReader(credential_report_csv.splitlines())
-    with open(file, 'w') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=reader.__next__())
-        writer.writeheader()
-        for row in reader:
-            writer.writerow(row)
+# def write_string_as_csv(data: bytes, file):
+#     credential_report_csv = bytes(data).decode('ascii')
+#     reader = csv.DictReader(credential_report_csv.splitlines())
+#     with open(file, 'w') as csvfile:
+#         writer = csv.DictWriter(csvfile, fieldnames=reader.__next__())
+#         writer.writeheader()
+#         for row in reader:
+#             writer.writerow(row)
 
 
 def write_meta(filePrefix, metaData):

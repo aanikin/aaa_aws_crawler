@@ -3,15 +3,13 @@ import boto3
 
 class ClientProvider(object):
 
-    def __init__(self, rootAccount, assumeRole='OrganizationAccountAccessRole'):
-        self._rootSession = boto3.Session()
-        self._rootAccount = rootAccount
-        self._assumeRole = assumeRole
-
     def __init__(self, rootAccount, accessKey: str = None, secretKey: str = None,
                  assumeRole='OrganizationAccountAccessRole'):
-        self._rootSession = boto3.Session(aws_access_key_id=accessKey,
-                                          aws_secret_access_key=secretKey)
+        if accessKey is None or secretKey is None:
+            self._rootSession = boto3.Session()
+        else:
+            self._rootSession = boto3.Session(aws_access_key_id=accessKey,
+                                              aws_secret_access_key=secretKey)
 
         self._rootAccount = rootAccount
         self._assumeRole = assumeRole
@@ -33,9 +31,6 @@ class ClientProvider(object):
                              aws_session_token=newsession_token)
 
     def get_client(self, accountId, serviceName, region='us-east-1'):
-        # if (not accountId or not serviceName):
-        #    raise Exception('Wrong parameters!')
-
         session = self._rootSession
         if (accountId != self._rootAccount):
             session = self.assumed_role_session(accountId)

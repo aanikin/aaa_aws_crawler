@@ -18,8 +18,6 @@ class AuditTests(TestCase):
         client = Mock()
         client._endpoint.host = 'https://iam.amazonaws.com'
 
-        provider.get_client.return_value = client
-
         iam = Iam()
 
         accounts = ['123', '-234']
