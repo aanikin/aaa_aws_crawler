@@ -35,4 +35,5 @@ class ClientProvider(object):
         if (accountId != self._rootAccount):
             session = self.assumed_role_session(accountId)
 
+        print(accountId + ": " + serviceName + " client created.")
         return session.client(service_name=serviceName, region_name=region, use_ssl=True)

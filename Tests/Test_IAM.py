@@ -1,6 +1,6 @@
 import unittest
-from unittest.mock import patch, Mock, mock_open
-import IAM
+from unittest.mock import Mock
+import IAM_Reports
 import os
 
 
@@ -9,7 +9,7 @@ class IAMTests(unittest.TestCase):
         self.iam_client = Mock()
         self.iam_client._endpoint.host = 'https://iam.amazonaws.com'
 
-        self.iam = IAM.IAM(self.iam_client, "someAccount")
+        self.iam = IAM_Reports.IAM_Reports(self.iam_client, "someAccount")
 
     def test_enerate_credential_report(self):
         filePrefix = self.iam.reportFilenamePrefix + "IAM_generate_credential_report"

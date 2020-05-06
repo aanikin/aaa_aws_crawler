@@ -1,1 +1,3 @@
-rootAccountNumber = "account"
+RootAccountNumber = "ROOT"
+RootOU = "ROOTOU"
+ExcludedAccounts = ["-"]

@@ -10,6 +10,11 @@ import csv
 #         for row in reader:
 #             writer.writerow(row)
 
+# Multiline file with child account numbers
+def load_accounts_list(accountsFile):
+    with open(accountsFile, 'r') as f:
+        return f.read().splitlines()
+
 
 def write_meta(filePrefix, metaData):
     with open(filePrefix + '_meta', 'w') as f:
