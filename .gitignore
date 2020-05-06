@@ -132,4 +132,4 @@ dmypy.json
 Data/
 Reports/
 .idea/
-config.py
+Config.py
