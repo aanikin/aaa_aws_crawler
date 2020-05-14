@@ -12,10 +12,12 @@ class IAM(object):
         if not os.path.exists(self._folder):
             os.mkdir(self._folder)
 
-        self.reportFilenamePrefix = self._folder + "_"
+        self.reportFilenamePrefix = self._folder + '/' + accountId + "_"
 
-        self.reportType = self.__class__.__name__
+        self.reportClass = self.__class__.__name__
 
-    def save_reports(self, filePrefix, metaData, content, contentType="json"):
+    def save_reports(self, reportName, metaData, content, contentType="json"):
+        filePrefix = self.reportFilenamePrefix + self.reportClass + "_" + reportName
+
         Utilites.write_meta(filePrefix, metaData)
         Utilites.write_data(filePrefix, content, contentType)

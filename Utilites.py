@@ -1,4 +1,6 @@
 import csv
+import datetime
+import json
 
 
 # def write_string_as_csv(data: bytes, file):
@@ -19,9 +21,19 @@ def load_accounts_list(accountsFile):
 def write_meta(filePrefix, metaData):
     with open(filePrefix + '_meta', 'w') as f:
         for name, value in metaData.items():
-            f.writelines(name + ":" + value + '\n')
+            f.writelines(name + ":" + json.dumps(value, default=datetime_handler) + '\n')
+
+
+def datetime_handler(x):
+    if isinstance(x, datetime.datetime):
+        return x.isoformat()
+    raise TypeError("Unknown type")
 
 
 def write_data(filePrefix, data, type="json"):
-    with open(filePrefix + "." + type, 'w') as f:
-        f.writelines(data)
+    if type == "json":
+        with open(filePrefix + "." + type, 'w') as f:
+            json.dump(data, f, default=datetime_handler)
+    else:
+        with open(filePrefix + "." + type, 'w') as f:
+            f.writelines(data)

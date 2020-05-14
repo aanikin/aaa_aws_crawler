@@ -19,8 +19,9 @@ def audit_process(provider, accounts):
 def process_account(provider, account):
     iam = provider.get_client(account, 'iam')
     iam_reports = IAM_Reports.IAM_Reports(iam, account)
-    iam_keys = IAM_KeyRoutines.IAM_KeyRoutines(iam, account)
     iam_reports.run()
+
+    iam_keys = IAM_KeyRoutines.IAM_KeyRoutines(iam, account)
     iam_keys.run()
 
 

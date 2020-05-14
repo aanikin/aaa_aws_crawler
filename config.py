@@ -1,3 +1,4 @@
-RootAccountNumber = "ROOT"
-RootOU = "ROOTOU"
-ExcludedAccounts = ["-"]
+# Set correct numbers there
+RootAccountNumber = ""
+RootOU = ""
+ExcludedAccounts = [""]
