@@ -1,12 +1,15 @@
 import time
 import inspect
-from IAM import IAM
+from BaseReport import BaseReport
 
 
-class IAM_Reports(IAM):
-    def __init__(self, client, accountId, reportFolder='Reports'):
-        super(IAM_Reports, self).__init__(client, accountId, reportFolder)
-        self.reportType = "IAM"
+class IAM_Reports(BaseReport):
+
+    def __init__(self, client, accountId, reportFolder='Reports', shortAlias="IAM"):
+        BaseReport.__init__(self, client, accountId, reportFolder, shortAlias)
+
+        if self._client._endpoint.host != 'https://iam.amazonaws.com':
+            raise Exception('Provided client is not IAM client!')
 
     def run(self):
         self.generate_credential_report()
@@ -17,6 +20,7 @@ class IAM_Reports(IAM):
         self.list_attached_user_policies()
         self.list_attached_group_policies()
         self.list_attached_role_policies()
+        self.get_account_summary()
 
     def generate_credential_report(self):
         reportName = inspect.stack()[0][3]
@@ -138,5 +142,16 @@ class IAM_Reports(IAM):
                         "ResponseMetadata": response['ResponseMetadata']}
 
             self.save_reports(reportName + '_' + roleName, metaData, response['AttachedPolicies'])
+
+        print(self._accountId + ": " + reportName + " сomplete")
+
+    def get_account_summary(self):
+        reportName = inspect.stack()[0][3]
+
+        response = self._client.get_account_summary()
+
+        metaData = {"ResponseMetadata": response['ResponseMetadata']}
+
+        self.save_reports(reportName, metaData, response["SummaryMap"])
 
         print(self._accountId + ": " + reportName + " сomplete")

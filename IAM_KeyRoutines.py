@@ -1,15 +1,31 @@
-from IAM import IAM
+from BaseReport import BaseReport
 import inspect
+from datetime import datetime, timezone
 
 
-class IAM_KeyRoutines(IAM):
+class IAM_KeyRoutines(BaseReport):
+    def __init__(self, client, accountId, reportFolder='Reports', shortAlias=""):
+        BaseReport.__init__(self, client, accountId, reportFolder, shortAlias)
+
+        if self._client._endpoint.host != 'https://iam.amazonaws.com':
+            raise Exception('Provided client is not IAM client!')
+
     def run(self):
-        self.not_used_keys()
+        self.old_access_keys()
 
-    def not_used_keys(self):
-        reportName = self.reportClass + "_" + inspect.stack()[0][3]
-        filePrefix = self.reportFilenamePrefix + reportName
+    def old_access_keys(self):
+        reportName = inspect.stack()[0][3]
+        now = datetime.now(timezone.utc)
+        users = self._client.list_users()
 
-        # response = self._client.generate_credential_report()
+        keys = []
+        for user in users["Users"]:
+            accessKeys = self._client.list_access_keys(UserName=user['UserName'])
 
+            for key in accessKeys['AccessKeyMetadata']:
+                timeSpan = now - key["CreateDate"]
+                if timeSpan.days >= 90:
+                    keys.append(key)
+
+        self.save_reports(reportName, "", keys)
         print(self._accountId + ": " + reportName + " сomplete")

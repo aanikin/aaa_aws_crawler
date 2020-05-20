@@ -1,4 +1,4 @@
-# Set correct numbers there
+## Set correct numbers there
 RootAccountNumber = ""
 RootOU = ""
 ExcludedAccounts = [""]

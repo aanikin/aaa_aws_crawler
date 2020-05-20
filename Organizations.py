@@ -1,12 +1,14 @@
 import boto3
 import Config
 
-def get_accounts(aws_ou_parent_id):
-    #
+
+def get_organizations_client():
     session = boto3.Session()
-
     client = session.client('organizations')
+    return client
 
+
+def get_accounts(client, aws_ou_parent_id):
     paginator = client.get_paginator('list_accounts_for_parent')
     response_iterator = paginator.paginate(ParentId=aws_ou_parent_id)
     accounts = []
@@ -16,11 +18,7 @@ def get_accounts(aws_ou_parent_id):
     return accounts
 
 
-def list_organizational_units_for_parent(rootOU):
-    session = boto3.Session()
-
-    client = session.client('organizations')
-
+def list_organizational_units_for_parent(client, rootOU):
     paginator = client.get_paginator('list_organizational_units_for_parent')
     response_iterator = paginator.paginate(ParentId=rootOU)
 
@@ -34,14 +32,13 @@ def list_organizational_units_for_parent(rootOU):
 
 def get_all_accounts(rootOU):
     allAccounts = []
-
-    # get from root OU first
-    accounts = get_accounts(rootOU)
+    client = get_organizations_client()
+    accounts = get_accounts(client, rootOU)
     allAccounts.extend(accounts)
 
     # get from child OU
-    for ou in list_organizational_units_for_parent(rootOU):
-        accounts = get_accounts(ou)
+    for ou in list_organizational_units_for_parent(client, rootOU):
+        accounts = get_accounts(client, ou)
         allAccounts.extend(accounts)
 
     return allAccounts

@@ -1,11 +1,11 @@
 import os
+
 import Utilites
 
-class IAM(object):
-    def __init__(self, client, accountId, reportFolder='Reports'):
+
+class BaseReport(object):
+    def __init__(self, client, accountId, reportFolder='Reports', shortAlias=""):
         self._client = client
-        if self._client._endpoint.host != 'https://iam.amazonaws.com':
-            raise Exception('Provided client is not IAM client!')
 
         self._accountId = accountId
         self._folder = reportFolder + '/' + accountId
@@ -14,10 +14,16 @@ class IAM(object):
 
         self.reportFilenamePrefix = self._folder + '/' + accountId + "_"
 
-        self.reportClass = self.__class__.__name__
+        if not shortAlias:
+            self.reportClass = self.__class__.__name__
+        else:
+            self.reportClass = shortAlias
 
     def save_reports(self, reportName, metaData, content, contentType="json"):
+
         filePrefix = self.reportFilenamePrefix + self.reportClass + "_" + reportName
 
-        Utilites.write_meta(filePrefix, metaData)
+        if metaData:
+            Utilites.write_meta(filePrefix, metaData)
+
         Utilites.write_data(filePrefix, content, contentType)
