@@ -3,15 +3,15 @@ import boto3
 
 class ClientProvider(object):
 
-    def __init__(self, rootAccount, accessKey: str = None, secretKey: str = None,
+    def __init__(self, rootAccount, accessKey: str = "", secretKey: str = "",
                  assumeRole='OrganizationAccountAccessRole'):
-        if accessKey is None or secretKey is None:
+        if not accessKey or not secretKey:
             self._rootSession = boto3.Session()
         else:
             self._rootSession = boto3.Session(aws_access_key_id=accessKey,
                                               aws_secret_access_key=secretKey)
 
-        self._rootAccount = rootAccount
+        self.rootAccount = rootAccount
         self._assumeRole = assumeRole
 
     def assumed_role_session(self, accountId):
@@ -32,8 +32,27 @@ class ClientProvider(object):
 
     def get_client(self, accountId, serviceName, region='us-east-1'):
         session = self._rootSession
-        if (accountId != self._rootAccount):
+        if (accountId != self.rootAccount):
             session = self.assumed_role_session(accountId)
 
-        print(accountId + ": " + serviceName + " client created.")
+        print("\033[90m" + accountId + ": client for service " + serviceName + " created.\033[0m")
         return session.client(service_name=serviceName, region_name=region, use_ssl=True)
+
+    def get_client_for_root(self, serviceName, region='us-east-1'):
+        session = self._rootSession
+
+        print("\033[90mROOT: client for " + serviceName + " created.\033[0m")
+        return session.client(service_name=serviceName, region_name=region, use_ssl=True)
+
+    def get_clients_for_all_regions(self, accountId, serviceName):
+        session = self._rootSession
+        if (accountId != self.rootAccount):
+            session = self.assumed_role_session(accountId)
+
+        client = session.client('ec2')
+        regions = [region['RegionName'] for region in client.describe_regions()['Regions']]
+
+        for region in regions:
+            print(
+                "\033[90m" + accountId + ": client for service " + serviceName + " in region " + region + " created.\033[0m")
+            yield (region, session.client(service_name=serviceName, region_name=region, use_ssl=True))

@@ -1,6 +1,6 @@
 import unittest
 
-testmodules = ['Test_Audit', 'Test_ClientProvider', 'Test_IAM']
+testmodules = ['Test_process_accounts', 'Test_ClientProvider', 'Test_IAM']
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()

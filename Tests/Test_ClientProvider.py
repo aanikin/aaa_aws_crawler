@@ -10,7 +10,7 @@ class ClientProviderTests(unittest.TestCase):
 
         session.assert_called_with()
         assert provider._rootSession == session.return_value
-        assert provider._rootAccount == "rootAccount"
+        assert provider.rootAccount == "rootAccount"
         assert provider._assumeRole == "OrganizationAccountAccessRole"
 
     @patch("boto3.Session")
@@ -20,7 +20,7 @@ class ClientProviderTests(unittest.TestCase):
 
         session.assert_called_with(aws_access_key_id='accessKey', aws_secret_access_key='secretKey')
         assert provider._rootSession == session.return_value
-        assert provider._rootAccount == "rootAccount"
+        assert provider.rootAccount == "rootAccount"
         assert provider._assumeRole == "role"
 
     @patch("boto3.Session")

@@ -2,6 +2,10 @@ from BaseReport import BaseReport
 import inspect
 from datetime import datetime, timezone
 
+def keys_worker(provider, account):
+    iam = provider.get_client(account, 'iam')
+    iam_keys = IAM_KeyRoutines(iam, account)
+    iam_keys.run()
 
 class IAM_KeyRoutines(BaseReport):
     def __init__(self, client, accountId, reportFolder='Reports', shortAlias=""):
