@@ -1,6 +1,5 @@
 import boto3
 from threading import Lock
-import config
 
 lock = Lock()
 
@@ -35,22 +34,34 @@ def list_organizational_units_for_parent(client, rootOU):
     return OUs
 
 
-def get_all_accounts(rootOU):
+def get_root_account():
+    client = get_organizations_client()
+    response = client.describe_organization()
+
+    return response["Organization"]["MasterAccountId"]
+
+
+def get_root_ou(client):
+    response = client.list_roots()
+    return response["Roots"]
+
+
+def get_all_accounts():
     allAccounts = []
     client = get_organizations_client()
-    accounts = get_accounts(client, rootOU)
-    allAccounts.extend(accounts)
 
-    # get from child OU
-    for ou in list_organizational_units_for_parent(client, rootOU):
-        accounts = get_accounts(client, ou)
+    for root in get_root_ou(client):
+        id = root["Id"]
+        accounts = get_accounts(client, id)
         allAccounts.extend(accounts)
+
+        # get from child OU
+        for ou in list_organizational_units_for_parent(client, id):
+            accounts = get_accounts(client, ou)
+            allAccounts.extend(accounts)
 
     return allAccounts
 
 
 if __name__ == "__main__":
-    allAccounts = get_all_accounts(config.RootOU)
-
-    print(len(allAccounts))
-    print(allAccounts)
+    print(get_all_accounts())

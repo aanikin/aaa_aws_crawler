@@ -2,7 +2,6 @@ import importlib
 import argparse
 import time
 import clientprovider
-import config
 import organizations
 from utilites import log_output, log_error, load_accounts_list
 from propagatingthread import PropagatingThread
@@ -137,18 +136,22 @@ if __name__ == '__main__':
     if not role:
         raise Exception("Worker function name is not set!")
 
+    rootAccountId = organizations.get_root_account()
+
     if args.file:
         accounts = load_accounts_list(args.file)
     else:
         if args.organizations:
             log_output("Getting accounts list from organization...")
-            accounts = organizations.get_all_accounts(config.RootOU)
+            accounts = organizations.get_all_accounts()
 
-    if config.ExcludedAccounts is not None:
-        accounts = [account for account in accounts if account not in config.ExcludedAccounts]
+    # REDO THIS
+    ExcludedAccounts = []
+    if ExcludedAccounts is not None:
+        accounts = [account for account in accounts if account not in ExcludedAccounts]
 
     t = time.time()
-    process_accounts(rootAccountNumber=config.RootAccountNumber, accounts=accounts, worker_function=args.workerfunction,
+    process_accounts(rootAccountNumber=rootAccountId, accounts=accounts, worker_function=args.workerfunction,
                      before_run_function=args.beforefunction, after_run_function=args.afterfunction,
                      assumeRoleName=role,
                      degreeeOfParallelizm=114)
