@@ -122,7 +122,8 @@ if __name__ == '__main__':
     parser.add_argument("-R", "--assumeRoleName", default="OrganizationAccountAccessRole",
                         help="name of the role to assume")
     parser.add_argument("-AK", "--accessKey", help="function name to be run before run")
-    parser.add_argument("-Sk", "--secretKey", help="function name to be run after run")
+    parser.add_argument("-SK", "--secretKey", help="function name to be run after run")
+    parser.add_argument("-DOP", "--degreeeOfParallelizm", help="set number of worker threads (1 - run in one thread)")
 
     # Read arguments from the command line
     args = parser.parse_args()
@@ -150,8 +151,24 @@ if __name__ == '__main__':
     if ExcludedAccounts is not None:
         accounts = [account for account in accounts if account not in ExcludedAccounts]
 
-    t = time.time()
+    count = len(accounts)
+    if count < 1:
+        raise Exception("Accounts list is empty!")
+
+    if not args.degreeeOfParallelizm:
+        dop = count / 5.
+        if dop < 2:  # 10 threads in the same time will process 10 accounts
+            dop = count
+        else:
+            dop = 10
+    else:
+        if args.degreeeOfParallelizm == "MAX":
+            dop = count
+        else:
+            dop = args.degreeeOfParallelizm
+
     process_accounts(rootAccountNumber=rootAccountId, accounts=accounts, worker_function=args.workerfunction,
                      before_run_function=args.beforefunction, after_run_function=args.afterfunction,
                      assumeRoleName=role,
-                     degreeeOfParallelizm=114)
+                     access_key=args.accessKey, secret_key=args.secretKey,
+                     degreeeOfParallelizm=dop)
