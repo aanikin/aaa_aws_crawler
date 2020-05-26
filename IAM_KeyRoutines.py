@@ -1,4 +1,4 @@
-from BaseReport import BaseReport
+from basereport import BaseReport
 import inspect
 from datetime import datetime, timezone
 

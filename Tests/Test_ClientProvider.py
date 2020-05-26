@@ -1,12 +1,12 @@
 import unittest
 from unittest.mock import patch, Mock
-import ClientProvider
+import clientprovider
 
 
 class ClientProviderTests(unittest.TestCase):
     @patch("boto3.Session")
     def test_init(self, session):
-        provider = ClientProvider.ClientProvider("rootAccount")
+        provider = clientprovider.ClientProvider("rootAccount")
 
         session.assert_called_with()
         assert provider._rootSession == session.return_value
@@ -15,7 +15,7 @@ class ClientProviderTests(unittest.TestCase):
 
     @patch("boto3.Session")
     def test_init_with_keys(self, session):
-        provider = ClientProvider.ClientProvider("rootAccount", accessKey="accessKey", secretKey="secretKey",
+        provider = clientprovider.ClientProvider("rootAccount", accessKey="accessKey", secretKey="secretKey",
                                                  assumeRole="role")
 
         session.assert_called_with(aws_access_key_id='accessKey', aws_secret_access_key='secretKey')
@@ -25,7 +25,7 @@ class ClientProviderTests(unittest.TestCase):
 
     @patch("boto3.Session")
     def test_get_client_for_root(self, session):
-        provider = ClientProvider.ClientProvider("rootAccount")
+        provider = clientprovider.ClientProvider("rootAccount")
 
         provider.get_client("rootAccount", "someService", "someRegion")
 
@@ -33,7 +33,7 @@ class ClientProviderTests(unittest.TestCase):
 
     @patch("boto3.Session")
     def test_get_client_for_another_account(self, session):
-        provider = ClientProvider.ClientProvider("rootAccount")
+        provider = clientprovider.ClientProvider("rootAccount")
 
         provider.get_client("someAccount", "someService", "someRegion")
 
@@ -41,7 +41,7 @@ class ClientProviderTests(unittest.TestCase):
 
     @patch("boto3.Session")
     def test_assume_role(self, Session):
-        provider = ClientProvider.ClientProvider("rootAccount")
+        provider = clientprovider.ClientProvider("rootAccount")
 
         assumedSession = provider.assumed_role_session("someAccount")
 

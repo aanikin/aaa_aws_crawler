@@ -1,9 +1,14 @@
 import boto3
-import Config
+from threading import Lock
+import config
+
+lock = Lock()
 
 
 def get_organizations_client():
-    session = boto3.Session()
+    with lock:
+        session = boto3.Session()
+
     client = session.client('organizations')
     return client
 
@@ -45,7 +50,7 @@ def get_all_accounts(rootOU):
 
 
 if __name__ == "__main__":
-    allAccounts = get_all_accounts(Config.RootOU)
+    allAccounts = get_all_accounts(config.RootOU)
 
     print(len(allAccounts))
     print(allAccounts)

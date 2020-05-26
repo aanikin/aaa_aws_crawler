@@ -1,18 +1,20 @@
 import time
 import inspect
-from BaseReport import BaseReport
-import Organizations_Reports
+from basereport import BaseReport
+import organizations_reports
+import utilites
 
 
 def audit_worker(provider, account):
     # This should go first - to have info about account, in case it closed/suspended
     org = provider.get_client_for_root('organizations')  # must have root account session
-    org_reports = Organizations_Reports.Organizations_Reports(org, account)
+    org_reports = organizations_reports.Organizations_Reports(org, account)
     org_reports.run()
 
     iam = provider.get_client(account, 'iam')
     iam_reports = IAM_Reports(iam, account)
     iam_reports.run()
+
 
 class IAM_Reports(BaseReport):
 
@@ -50,7 +52,7 @@ class IAM_Reports(BaseReport):
         # Save reports
         self.save_reports(reportName, metaData, bytes(response['Content']).decode('ascii'), "csv")
 
-        print(self._accountId + ": " + reportName + " сomplete")
+        utilites.log_output(reportName + " сomplete")
 
     def list_groups(self):
         reportName = inspect.stack()[0][3]
@@ -61,7 +63,7 @@ class IAM_Reports(BaseReport):
         # Save reports
         self.save_reports(reportName, metaData, response['Groups'])
 
-        print(self._accountId + ": " + reportName + " сomplete")
+        utilites.log_output(reportName + " сomplete")
 
     def list_roles(self):
         reportName = inspect.stack()[0][3]
@@ -72,7 +74,7 @@ class IAM_Reports(BaseReport):
         metaData = {"ResponseMetadata": response['ResponseMetadata']}
         self.save_reports(reportName, metaData, response['Roles'])
 
-        print(self._accountId + ": " + reportName + " сomplete")
+        utilites.log_output(reportName + " сomplete")
 
     def list_groups_for_user(self):
         reportName = inspect.stack()[0][3]
@@ -86,7 +88,7 @@ class IAM_Reports(BaseReport):
                         "ResponseMetadata": response['ResponseMetadata']}
             self.save_reports(reportName + '_' + user['UserName'], metaData, response['Groups'])
 
-        print(self._accountId + ": " + reportName + " сomplete")
+        utilites.log_output(reportName + " сomplete")
 
     def get_group(self):
         reportName = inspect.stack()[0][3]
@@ -104,7 +106,7 @@ class IAM_Reports(BaseReport):
 
             self.save_reports(reportName + '_' + group['GroupName'], metaData, response['Users'])
 
-        print(self._accountId + ": " + reportName + " сomplete")
+        utilites.log_output(reportName + " сomplete")
 
     def list_attached_user_policies(self):
         reportName = inspect.stack()[0][3]
@@ -121,7 +123,7 @@ class IAM_Reports(BaseReport):
             # Save reports
             self.save_reports(reportName + '_' + user['UserName'], metaData, response['AttachedPolicies'])
 
-        print(self._accountId + ": " + reportName + " сomplete")
+        utilites.log_output(reportName + " сomplete")
 
     def list_attached_group_policies(self):
         reportName = inspect.stack()[0][3]
@@ -137,7 +139,7 @@ class IAM_Reports(BaseReport):
             # Save reports
             self.save_reports(reportName + '_' + groupName, metaData, response['AttachedPolicies'])
 
-        print(self._accountId + ": " + reportName + " сomplete")
+        utilites.log_output(reportName + " сomplete")
 
     def list_attached_role_policies(self):
         reportName = inspect.stack()[0][3]
@@ -154,7 +156,7 @@ class IAM_Reports(BaseReport):
 
             self.save_reports(reportName + '_' + roleName, metaData, response['AttachedPolicies'])
 
-        print(self._accountId + ": " + reportName + " сomplete")
+        utilites.log_output(reportName + " сomplete")
 
     def get_account_summary(self):
         reportName = inspect.stack()[0][3]
@@ -165,4 +167,4 @@ class IAM_Reports(BaseReport):
 
         self.save_reports(reportName, metaData, response["SummaryMap"])
 
-        print(self._accountId + ": " + reportName + " сomplete")
+        utilites.log_output(reportName + " сomplete")

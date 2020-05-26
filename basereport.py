@@ -1,6 +1,6 @@
 import os
 
-import Utilites
+import utilites
 
 
 class BaseReport(object):
@@ -24,6 +24,6 @@ class BaseReport(object):
         filePrefix = self.reportFilenamePrefix + self.reportClass + "_" + reportName
 
         if metaData:
-            Utilites.write_meta(filePrefix, metaData)
+            utilites.write_meta(filePrefix, metaData)
 
-        Utilites.write_data(filePrefix, content, contentType)
+        utilites.write_data(filePrefix, content, contentType)
