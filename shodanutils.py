@@ -20,19 +20,22 @@ def worker(provider, account):
     networkTitle = account + " " + describeAccount["Account"]["Name"]
     log_output(networkTitle)
 
-    ips = ec2.get_ips_for_account(provider, account, association="ASSOCIATED")
-    if len(ips) == 0:
-        log_output("No public IP addresses in account.")
-        return
-
-    save_ips_to_file(accountId=account, ips=ips)
+    ips = ec2.get_ips_for_account(provider, account, association="ALL")  # ASSOCIATED
 
     api = shodan.Shodan(get_api_key())
     alerts = api.alerts(include_expired=True)
 
-    alertId = get_alert(alerts, networkTitle)
+    alert = get_alert(alerts, networkTitle)
 
-    if not alertId:
+    if len(ips) == 0:
+        log_output("No public IP addresses in account. Cleaning up Shodan.")
+        if alert:
+            api.delete_alert(alert["id"])
+        return
+
+    save_ips_to_file(accountId=account, ips=ips)
+
+    if not alert:
         alert = api.create_alert(name=networkTitle, ip=ips)
         triggers = api.alert_triggers()
         for trigger in triggers:
@@ -43,16 +46,16 @@ def worker(provider, account):
         api.add_alert_notifier(alert["id"], get_slack_notifier_id(api))
         log_output("Alert " + networkTitle + " created with IPs " + str(ips))
     else:
-        api.edit_alert(alertId, ip=ips)
+        api.edit_alert(alert["id"], ip=ips)
         log_output("Alert " + networkTitle + " updated with IPs " + str(ips))
 
 
 def get_alert(alerts, networkTitle):
     for alert in alerts:
         if alert["name"] == networkTitle:
-            return alert["id"]
+            return alert
 
-    return ""
+    return None
 
 
 def get_slack_notifier_id(api):

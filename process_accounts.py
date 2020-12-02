@@ -74,13 +74,14 @@ def parallel_run(rootAccountNumber, accounts, f, degreeeOfParallelizm, accessKey
 
         for thread in threads:
             thread.start()
-        try:
-            for thread in threads:
+
+        for thread in threads:
+            try:
                 thread.join()
-        except Exception as e:
-            error = str(e)
-            log_output('\033[91m' + error + '\033[0m')
-            log_error(error)
+            except Exception as e:
+                error = str(e)
+                log_output('\033[91m' + error + '\033[0m')
+                log_error(error)
 
 
 def one_worker_run(rootAccountNumber, accounts, f, accessKey, secretKey, assumeRoleName):
@@ -162,10 +163,10 @@ if __name__ == '__main__':
         else:
             dop = 10
     else:
-        if args.degreeeOfParallelizm == "MAX":
+        if args.degreeeOfParallelizm == -1:
             dop = count
         else:
-            dop = args.degreeeOfParallelizm
+            dop = int(args.degreeeOfParallelizm)
 
     process_accounts(rootAccountNumber=rootAccountId, accounts=accounts, worker_function=args.workerfunction,
                      before_run_function=args.beforefunction, after_run_function=args.afterfunction,
